@@ -1,0 +1,46 @@
+server:
+  port: 8081
+spring:
+  #给项目来个名字
+  application:
+    name: rabbitmq-provider
+  #配置rabbitMq 服务器
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+#    #虚拟host 可以不设置,使用server默认host
+#    virtual-host: /
+    #确认消息已发送到交换机(Exchange)
+    publisher-confirm-type: correlated
+    #确认消息已发送到队列(Queue)
+    publisher-returns: true
+    listener:
+      type: simple
+      simple:
+        #消费失败消息干掉
+        default-requeue-rejected: true
+#        acknowledge-mode: manual # 消息消费确认，可以手动确认 消费端需要添加
+        prefetch: 1 # 消费者每次从队列获取的消息数量
+        concurrency: 2 # 消费者数量
+        max-concurrency: 10 # 启动消费者最大数量
+        # 重试策略相关配置
+        retry:
+          enabled: true #开启消费者重试
+          max-attempts: 3 #最大重试次数
+          initial-interval: 2000 #重试间隔时间
+      template:
+        #在消息没有被路由到合适队列情况下会将消息返还给消息发布者
+        #当mandatory标志位设置为true时，如果exchange根据自身类型和消息routingKey无法找到一个合适的queue存储消息，
+        # 那么broker会调用basic.return方法将消息返还给生产者;当mandatory设置为false时，
+        # 出现上述情况broker会直接将消息丢弃;通俗的讲，mandatory标志告诉broker代理服务器至少将消息route到一个队列中，
+        # 否则就将消息return给发送者;
+        #: true # 启用强制信息
+        mandatory: true
+#微信支付信息配置
+weixin:
+  appid: wx8397f8696b538317
+  partner: 1473426802
+  partnerkey: T6m9iK73b0kn9g5v426MKfHQH7X8rKwb
+  notifyurl:  http://127.0.0.1:8081/weixin/pay/notify/url
